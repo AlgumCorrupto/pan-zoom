@@ -3,7 +3,7 @@ import { ViewChild, AfterViewInit } from '@angular/core';
 import { OnInit, Renderer2 } from '@angular/core';
 
 import * as PIXI from 'pixi.js'
-import { Viewport } from 'pixi-viewport'
+import { Viewport, IWheelOptions, IMouseEdgesOptions, IDragOptions } from 'pixi-viewport'
 
 @Component({
   selector: 'app-scene',
@@ -17,7 +17,7 @@ export class SceneComponent implements OnInit {
   rectangle = new PIXI.Graphics();
 
   app: PIXI.Application<HTMLCanvasElement> = new PIXI.Application({
-    width: 512,
+    width: window.screen.width,
     height: 512,
     backgroundColor: 0xFA23CD
   });
@@ -31,6 +31,7 @@ export class SceneComponent implements OnInit {
     events: this.app.renderer.events
   })
 
+
   constructor(private renderer2: Renderer2) {}
 
   ngOnInit(): void {
@@ -42,7 +43,7 @@ export class SceneComponent implements OnInit {
     //screen rectangle
     let windowRectangle = new PIXI.Graphics;
     windowRectangle.beginFill(0x00ff00);
-    windowRectangle.drawRect(0, 0, 512, 512);
+    windowRectangle.drawRect(0, 0, this.app.view.width, 512);
     windowRectangle.endFill();
     this.screenContainer.addChild(windowRectangle)
 
@@ -50,11 +51,22 @@ export class SceneComponent implements OnInit {
     this.app.stage.addChild(this.screenContainer);
     this.screenContainer.addChild(this.viewport)
 
+    let dragOptions: IDragOptions = {
+      direction: 'x'
+    }
+    let edgesOptions: IMouseEdgesOptions = {
+      top: 80,
+      bottom: 80
+    };
+    let wheelOptions: IWheelOptions = {
+      axis: 'x'
+    }
 
     this.viewport
-      .drag()
+      .drag(dragOptions)
       .pinch()
-      .wheel()
+      .mouseEdges(edgesOptions)
+      .wheel(wheelOptions)
       .decelerate()
 
 
