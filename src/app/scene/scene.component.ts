@@ -18,8 +18,9 @@ export class SceneComponent implements OnInit {
   //is mouse dragging
   dragging = false;
 
-  //world to screen offset 
-  wtsOffset = 0
+  //world zoom offset 
+  //worldZoomOffsX = 0;
+  //worldZoomOffsY = 0;
 
   //mouse variables   
   mouseX:number = 0 
@@ -57,11 +58,11 @@ export class SceneComponent implements OnInit {
     //world config
     this.worldContainer.eventMode = 'static'
     let anchor = () => {
-      this.worldContainer.pivot.x = this.worldContainer.x * 0.5;
-      this.worldContainer.pivot.y = this.worldContainer.y * 0.5;
+      this.worldContainer.pivot.x = this.worldContainer.x * 256;
+      this.worldContainer.pivot.y = this.worldContainer.y * 256;
     }
     this.worldContainer.scale.set(0.5)
-   anchor();
+    anchor();
    
     //interaction config
     this.app.stage.interactive = true;
@@ -107,21 +108,42 @@ export class SceneComponent implements OnInit {
 
       this.worldContainer.x += ev.globalX - this.startPanX
       this.worldContainer.y += ev.globalY - this.startPanY
+// 
+      // this.worldZoomOffsX = this.worldContainer.position.x
+      // this.worldZoomOffsY = this.worldContainer.position.y
 
       this.startPanX = ev.globalX
       this.startPanY = ev.globalY
+
     }
   }
 
   strech(ev: PIXI.FederatedWheelEvent) {
 
-    var worldPos = (ev.offsetX - this.worldContainer.x) / this.worldContainer.scale.x
-    var newScale = this.screenContainer.scale.x * (ev.deltaY)
-    var newScreenPos = (worldPos ) * newScale + this.screenContainer.x;
+    //var worldPos = (ev.offsetX - this.worldContainer.x) / this.worldContainer.scale.x
+    //var newScale = this.screenContainer.scale.x * (ev.deltaY)
+    //var newScreenPos = (worldPos ) * newScale + this.screenContainer.x;
+    
+    let scaleBeforeZoomX = this.worldContainer.scale.x
+    let scaleBeforeZoomY = this.worldContainer.scale.y
 
-    this.worldContainer.x -= (newScreenPos - ev.offsetX) ;
-    this.worldContainer.scale.x *=  (ev.deltaY/57);
-    console.log(ev.deltaY)
+    let scaleAfterZoomX = 0
+    let scaleAfterZoomY = 0
+
+    if(ev.deltaY > 0) {
+      scaleAfterZoomX = this.worldContainer.scale.y * 1.1;
+      scaleAfterZoomY = this.worldContainer.scale.y * 1.1;
+    }
+    else {
+      scaleAfterZoomX = this.worldContainer.scale.x * 0.9;
+      scaleAfterZoomY = this.worldContainer.scale.y * 0.9;
+    }
+
+    this.worldContainer.scale.x = scaleAfterZoomX;
+    this.worldContainer.scale.y = scaleAfterZoomY;
+
+    //console.log(beforeZoom)
+    //console.log(afterZoom)
   }
 
 
