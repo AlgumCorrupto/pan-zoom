@@ -16,6 +16,10 @@ export class SceneComponent implements OnInit {
   screenContainer = new PIXI.Container();
   rectangle = new PIXI.Graphics();
 
+
+  notes: PIXI.Sprite[] =  [];
+  currentNote?: PIXI.Sprite = undefined;
+
   app: PIXI.Application<HTMLCanvasElement> = new PIXI.Application({
     width: window.screen.width,
     height: 512,
@@ -52,7 +56,8 @@ export class SceneComponent implements OnInit {
     this.screenContainer.addChild(this.viewport)
 
     let dragOptions: IDragOptions = {
-      direction: 'x'
+      direction: 'x',
+      mouseButtons: 'middle'
     }
     let edgesOptions: IMouseEdgesOptions = {
       top: 80,
@@ -79,7 +84,83 @@ export class SceneComponent implements OnInit {
     this.rectangle.drawRect(256, 256, 128, 128);
     this.rectangle.endFill();
     this.viewport.addChild(this.rectangle);
+
+    //this.nRect.height = 16;
+
+    //grid
+    this.makeGrid()
+
+    //viewport event
+    this.viewport.on('pointerdown', (ev) => this.spawnInteractiveRect(ev, this.viewport))
+
+    //this.nRect.position.x = 256
+    //this.nRect.position.y = 256
+    //this.viewport.addChild(this.nRect)
   }
+
+  makeGrid() {
+    let grid = new PIXI.Container()
+    grid.width = 40;
+    grid.height = 20;
+    grid.interactive = true
+    this.viewport.addChild(grid) 
+
+    let gridRect = new PIXI.Graphics();
+    gridRect.beginFill(0xFF3355);
+    gridRect.drawRect(0, 0, 40, 20);
+    gridRect.endFill();
+    gridRect.interactive = true
+    grid.addChild(gridRect)
+    grid.x = 0
+    grid.y = 0
+
+    grid.on("pointerup", (ev)=> {
+      gridRect.clear()
+      gridRect.beginFill(0xEE9952);
+      gridRect.drawRect(0, 0, 40, 20);
+      gridRect.endFill();
+    })
+
+  }
+
+  spawnInteractiveRect(ev: PIXI.FederatedMouseEvent, viewport: Viewport) {
+    if(this.currentNote !== undefined)
+      return;
+
+      let noteBuffer = PIXI.Sprite.from('../../assets/orangerect.bmp')
+      noteBuffer.height = 16
+
+      noteBuffer.interactive = true;
+
+      noteBuffer.position = ev.getLocalPosition(viewport)
+
+      //noteBuffer.on('pointerdown', (ev) => {this.selectRect(ev, noteBuffer)} )
+      //noteBuffer.on('pointerup', this.unfocusRect)
+      viewport.addChild(noteBuffer)
+      this.notes.push(noteBuffer)
+  }
+
+  //moveInteractiveRect(ev: PIXI.FederatedMouseEvent) {
+  //  if(this.currentNote === undefined)
+  //    return;
+//
+  //  this.currentNote.parent.toLocal(ev.global, undefined, this.currentNote.position)
+//
+  //} 
+//
+  //unfocusRect(ev: PIXI.FederatedMouseEvent) {
+  //  if(this.currentNote === undefined)
+  //    return;
+//
+  //    this.currentNote = undefined;
+  //}
+//
+  //selectRect(ev: PIXI.FederatedMouseEvent, nRect: PIXI.Sprite) {
+  //  if(this.currentNote !== undefined)
+  //    return
+  //  this.currentNote = nRect;
+  //  this.viewport.on('pointermove', this.moveInteractiveRect)
+  //}
 
 }
 
