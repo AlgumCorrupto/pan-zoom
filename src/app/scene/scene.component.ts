@@ -18,7 +18,7 @@ export class SceneComponent implements OnInit {
 
 
   notes: PIXI.Sprite[] =  [];
-  currentNote?: PIXI.Sprite = undefined;
+  currentNote: PIXI.Sprite | null = null;
 
   app: PIXI.Application<HTMLCanvasElement> = new PIXI.Application({
     width: window.screen.width,
@@ -124,8 +124,10 @@ export class SceneComponent implements OnInit {
   }
 
   spawnInteractiveRect(ev: PIXI.FederatedMouseEvent, viewport: Viewport) {
-    if(this.currentNote !== undefined)
+    if(this.currentNote)
       return;
+
+    console.log("criar")
 
       let noteBuffer = PIXI.Sprite.from('../../assets/orangerect.bmp')
       noteBuffer.height = 16
@@ -134,33 +136,38 @@ export class SceneComponent implements OnInit {
 
       noteBuffer.position = ev.getLocalPosition(viewport)
 
-      //noteBuffer.on('pointerdown', (ev) => {this.selectRect(ev, noteBuffer)} )
-      //noteBuffer.on('pointerup', this.unfocusRect)
+      noteBuffer.on('pointerenter', (ev) => {this.selectRect(ev, noteBuffer)} )
+      noteBuffer.on('pointerout', this.unfocusRect)
       viewport.addChild(noteBuffer)
       this.notes.push(noteBuffer)
   }
 
   //moveInteractiveRect(ev: PIXI.FederatedMouseEvent) {
-  //  if(this.currentNote === undefined)
-  //    return;
+//  if(this.currentNote == undefined)
+//      return;
 //
-  //  this.currentNote.parent.toLocal(ev.global, undefined, this.currentNote.position)
+//      
 //
-  //} 
+//    this.currentNote.parent.toLocal(ev.global, undefined, this.currentNote.position)
 //
-  //unfocusRect(ev: PIXI.FederatedMouseEvent) {
-  //  if(this.currentNote === undefined)
-  //    return;
-//
-  //    this.currentNote = undefined;
-  //}
-//
-  //selectRect(ev: PIXI.FederatedMouseEvent, nRect: PIXI.Sprite) {
-  //  if(this.currentNote !== undefined)
-  //    return
-  //  this.currentNote = nRect;
-  //  this.viewport.on('pointermove', this.moveInteractiveRect)
-  //}
+//  } 
+
+  unfocusRect(ev: PIXI.FederatedMouseEvent) {
+    if(this.currentNote)
+      return
+      console.log(this.currentNote, "dor")
+    this.currentNote = null;
+  }
+
+  selectRect(ev: PIXI.FederatedMouseEvent, nRect: PIXI.Sprite) {
+    if(this.currentNote)
+      return
+    
+    console.log("retângulo selecionado")
+    this.currentNote = nRect;
+    //this.viewport.on('pointermove', this.moveInteractiveRect)
+    console.log(this.currentNote)
+  }
 
 }
 
